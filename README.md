@@ -17,7 +17,8 @@ chains = {
   "optimism": "api-optimistic.etherscan.io",
   "binance": "api.bscscan.com",
   "avalanche": "api.snowtrace.io",
-  "moonbeam": "api-moonbeam.moonscan.io"
+  "moonbeam": "api-moonbeam.moonscan.io",
+  "ethereum": "api.etherscan.io"
 }
 ```
 
