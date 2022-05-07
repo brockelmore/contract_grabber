@@ -2,6 +2,7 @@ import requests as r
 import os
 import sys
 import json
+import toml
 
 api_key_base = "&apikey="
 endpoint = "/api?module=contract&action=getsourcecode&address="
@@ -23,10 +24,14 @@ def main():
   name = sys.argv[1]
   addr = sys.argv[2]
   api_key = sys.argv[3]
-  if len(sys.argv) == 5:
+  if len(sys.argv) >= 5:
     chain = chains[sys.argv[4]]
   else:
     chain = default_chain
+
+  init_forge_repo = False
+  if len(sys.argv) >= 6:
+    init_forge_repo = bool(sys.argv[5])
 
   api_key = api_key_base + api_key
 
@@ -36,6 +41,22 @@ def main():
   directory = mkdir(name)
   writeContracts(directory, sources)
   print("Wrote contracts to: ", directory)
+  if init_forge_repo:
+    curr_dir = os.getcwd()
+    os.chdir(directory)
+    os.system("forge config > foundry.toml")
+    with open("./foundry.toml", "r+") as config:
+      conf = toml.loads(config.read())
+      for d in os.listdir(directory):
+        if os.path.isdir(d):
+          if d.startswith("src") or d.startswith("contracts"):
+            continue
+          else:
+            conf["default"]["libs"].append(d)
+      config.seek(0)
+      config.write(toml.dumps(conf))
+    os.chdir(curr_dir)
+
 
 def writeContracts(directory, sources):
   for source in sources.keys():
